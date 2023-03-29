@@ -19,18 +19,18 @@
     font-family: 'Lato';
     font-style: normal;
     font-weight: 400;
-    font-size: 21px;
+    font-size: 18px;
     line-height: 25px;
     letter-spacing: 0.0015em;
     color: #0E161A;
 }
 
 .product-info {
-    padding: 20px;
+    padding: 14px;
 }
 
 .product-info p {
-    margin-top: 0px;
+    margin-top: 5px;
 }
 
 .btn-cart {
