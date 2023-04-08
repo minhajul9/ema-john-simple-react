@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { addToDb, getShoppingCart } from '../../utilities/fakedb';
+import { addToDb, deleteShoppingCart, getShoppingCart } from '../../utilities/fakedb';
 import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css'
+import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([])
 
-    useEffect(() => { 
+    useEffect(() => {
         fetch('products.json')
             .then(res => res.json())
             .then(data => setProducts(data))
     }, [])
 
-    useEffect( () => {
+    useEffect(() => {
         const storedCart = getShoppingCart();
-        const savedCart =[];
+        const savedCart = [];
 
-        for( const id in storedCart){
-            const addedProduct = products.find( product => product.id === id);
+        for (const id in storedCart) {
+            const addedProduct = products.find(product => product.id === id);
 
-            if(addedProduct){
+            if (addedProduct) {
                 const quantity = storedCart[id];
                 addedProduct.quantity = quantity;
                 savedCart.push(addedProduct);
@@ -30,18 +33,18 @@ const Shop = () => {
         setCart(savedCart)
     }, [products])
 
-    const handleAddToCart = (product) =>{
+    const handleAddToCart = (product) => {
         // const newCart = [...cart, product];
 
         // first check if the product exist in cart or not 
-        const exist = cart.find( pd => pd.id === product.id)
+        const exist = cart.find(pd => pd.id === product.id)
         let newCart = [];
         // if the item not exist in the cart we will add it to the cart with quantity updated to 1
-        if(!exist){
+        if (!exist) {
             product.quantity = 1;
-            newCart =[...cart, product];
+            newCart = [...cart, product];
         }
-        else{
+        else {
             // if the item exist is the cart 
             // step 1- increase the quantity
             exist.quantity += 1;
@@ -57,6 +60,12 @@ const Shop = () => {
         addToDb(product.id)
     }
 
+    const handleClearCart = () => {
+        setCart([])
+        deleteShoppingCart();
+    }
+
+
     return (
         <div className='shop-container'>
             <div className="products-container">
@@ -69,7 +78,18 @@ const Shop = () => {
                 }
             </div>
             <div className="cart-container">
-                <Cart cart={cart}></Cart>
+                <Cart
+                    cart={cart}
+                    handleClearCart={handleClearCart}
+                >
+                    <Link className='proceed-link' to='/orders'>
+                        <button className='btn-proceed'>
+                            <span>Review Order</span>
+                            <FontAwesomeIcon icon={faArrowRight} />
+                        </button>
+
+                    </Link>
+                </Cart>
             </div>
 
         </div>
