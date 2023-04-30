@@ -6,3 +6,8 @@
  * 5. Build > Authentication > get started > enable sign in methods
  * 6. create sign up and login route
  * */ 
+
+/**
+ * 1. create a context provider
+ * 2. create context and set provider
+ * */ 
