@@ -1,17 +1,16 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import './Login.css'
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../providers/AuthProvider';
 
 const Login = () => {
-
+    
+    const [show, setShow] = useState(false);
     const {signIn} = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
     
-    console.log(location);
     const from = location.state?.from?.pathname || '/';
-    console.log(from);
 
     const handleLogin = event =>{
         event.preventDefault();
@@ -42,7 +41,10 @@ const Login = () => {
                 </div>
                 <div className="form-control">
                     <label htmlFor="">Password</label>
-                    <input type="password" name="password" id="pass" required placeholder='Enter your password' />
+                    <input type={show? "text":"password"} name="password" id="pass" required placeholder='Enter your password' />
+                    <p onClick={() => {setShow(!show)}}>
+                        {show? 'Hide password' : "Show password"}
+                    </p>
                 </div>
                 <input type="submit" value="Login" className='btn-submit' />
                 <p className='new-acc'>New to Ema-john? <Link to='/signup' className='create-new'>Create New Account</Link></p>
