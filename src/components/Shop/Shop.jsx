@@ -12,7 +12,7 @@ const Shop = () => {
     const [cart, setCart] = useState([])
 
     useEffect(() => {
-        fetch('products.json')
+        fetch('http://localhost:5000/products')
             .then(res => res.json())
             .then(data => setProducts(data))
     }, [])
@@ -22,7 +22,7 @@ const Shop = () => {
         const savedCart = [];
 
         for (const id in storedCart) {
-            const addedProduct = products.find(product => product.id === id);
+            const addedProduct = products.find(product => product._id === id);
 
             if (addedProduct) {
                 const quantity = storedCart[id];
@@ -37,7 +37,7 @@ const Shop = () => {
         // const newCart = [...cart, product];
 
         // first check if the product exist in cart or not 
-        const exist = cart.find(pd => pd.id === product.id)
+        const exist = cart.find(pd => pd._id === product._id)
         let newCart = [];
         // if the item not exist in the cart we will add it to the cart with quantity updated to 1
         if (!exist) {
@@ -50,14 +50,14 @@ const Shop = () => {
             exist.quantity += 1;
 
             // step-2 take all the items from the cart except the current 1
-            const remaining = cart.filter(pd => pd.id !== exist.id);
+            const remaining = cart.filter(pd => pd._id !== exist._id);
 
             // make a new cart with updated current and remaining items
             newCart = [...remaining, exist]
         }
 
         setCart(newCart);
-        addToDb(product.id)
+        addToDb(product._id)
     }
 
     const handleClearCart = () => {
@@ -71,7 +71,7 @@ const Shop = () => {
             <div className="products-container">
                 {
                     products.map(product => <Product
-                        key={product.id}
+                        key={product._id}
                         product={product}
                         handleAddToCart={handleAddToCart}
                     ></Product>)
