@@ -3,15 +3,19 @@ import { addToDb, deleteShoppingCart, getShoppingCart } from '../../utilities/fa
 import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css'
-import { Link } from 'react-router-dom';
+import { Link, useLoaderData } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
-    const [totalProducts, setTotalProducts] = useState(0);
-    const itemsPerPage = 10; //TODO: make it dynamic
+    const {totalProducts} = useLoaderData();
+    const [itemsPerPage, setItemsPerPage] = useState(9); //TODO: make it dynamic
+    const [currentPage, setCurrentPage] = useState(0)
+
+    //items per page options
+    const options = [9, 15, 20];
 
     // steps for Pagination
     /**
@@ -20,14 +24,25 @@ const Shop = () => {
      * 
     */
 
+    // useEffect(() => {
+    //     fetch(`http://localhost:5000/products`)
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             setProducts(data);
+    //             setTotalProducts(data.length);
+    //         })
+    // }, [])
+
+
+
     useEffect(() => {
-        fetch('http://localhost:5000/products')
+        fetch(`http://localhost:5000/products?page=${currentPage}&limit=${itemsPerPage}`)
             .then(res => res.json())
             .then(data => {
                 setProducts(data);
-                setTotalProducts(data.length);
+                
             })
-    }, [])
+    }, [itemsPerPage, currentPage])
 
     // console.log(totalProducts);
     const totalPages = Math.ceil(totalProducts / itemsPerPage);
@@ -40,7 +55,7 @@ const Shop = () => {
 
     const pageNumbers = [...Array(totalPages).keys()];
 
-    console.log(pageNumbers);
+    // console.log(pageNumbers);
 
     useEffect(() => {
         const storedCart = getShoppingCart();
@@ -90,9 +105,17 @@ const Shop = () => {
         deleteShoppingCart();
     }
 
+    const handleSelectChange = (event) => {
+        const selectedValue = parseInt(event.target.value);
+        setItemsPerPage(selectedValue);
+        // onChange(selectedValue);
+        setCurrentPage(0)
+      };
+
 
     return (
         <>
+            {/* shop products */}
             <div className='shop-container'>
                 <div className="products-container">
                     {
@@ -119,10 +142,24 @@ const Shop = () => {
                 </div>
 
             </div>
+
+            {/* pagination */}
             <div className="pagination">
+                <p>Current Page: {currentPage}</p>
                 {
-                    pageNumbers.map( number => <button key={number}>{number}</button>)
+                    pageNumbers.map(number => <button
+                        key={number}
+                        className={currentPage === number && 'selected'}
+                        onClick={() => setCurrentPage(number)}
+                    >{number}</button>)
                 }
+                <select value={itemsPerPage} onChange={handleSelectChange}>
+                    {options.map((option) => (
+                        <option key={option} value={option}>
+                            {option}
+                        </option>
+                    ))}
+                </select>
             </div>
         </>
     );
