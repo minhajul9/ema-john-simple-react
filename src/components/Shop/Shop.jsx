@@ -10,7 +10,7 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 const Shop = () => {
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
-    const {totalProducts} = useLoaderData();
+    const { totalProducts } = useLoaderData();
     const [itemsPerPage, setItemsPerPage] = useState(9); //TODO: make it dynamic
     const [currentPage, setCurrentPage] = useState(0)
 
@@ -40,7 +40,7 @@ const Shop = () => {
             .then(res => res.json())
             .then(data => {
                 setProducts(data);
-                
+
             })
     }, [itemsPerPage, currentPage])
 
@@ -60,17 +60,30 @@ const Shop = () => {
     useEffect(() => {
         const storedCart = getShoppingCart();
         const savedCart = [];
+        const ids = Object.keys(storedCart)
 
-        for (const id in storedCart) {
-            const addedProduct = products.find(product => product._id === id);
+        fetch('http://localhost:5000/productsByIds', {
+            method: "POST",
+            headers: {
+                "content-type": 'application/json'
+            },
+            body: JSON.stringify(ids)
+        })
+            .then(res => res.json())
+            .then(cartProducts => {
+                for (const id in storedCart) {
+                    const addedProduct = cartProducts.find(product => product._id === id);
 
-            if (addedProduct) {
-                const quantity = storedCart[id];
-                addedProduct.quantity = quantity;
-                savedCart.push(addedProduct);
-            }
-        }
-        setCart(savedCart)
+                    if (addedProduct) {
+                        const quantity = storedCart[id];
+                        addedProduct.quantity = quantity;
+                        savedCart.push(addedProduct);
+                    }
+                }
+                setCart(savedCart)
+            })
+
+
     }, [products])
 
     const handleAddToCart = (product) => {
@@ -110,7 +123,7 @@ const Shop = () => {
         setItemsPerPage(selectedValue);
         // onChange(selectedValue);
         setCurrentPage(0)
-      };
+    };
 
 
     return (
@@ -149,7 +162,7 @@ const Shop = () => {
                 {
                     pageNumbers.map(number => <button
                         key={number}
-                        className={currentPage === number && 'selected'}
+                        className={currentPage === number ? 'selected' : ''}
                         onClick={() => setCurrentPage(number)}
                     >{number}</button>)
                 }
