@@ -9,13 +9,38 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
-    const [cart, setCart] = useState([])
+    const [cart, setCart] = useState([]);
+    const [totalProducts, setTotalProducts] = useState(0);
+    const itemsPerPage = 10; //TODO: make it dynamic
+
+    // steps for Pagination
+    /**
+     * Done 1: determine the total number of items
+     * TODO 2: Decide the number of items per page
+     * 
+    */
 
     useEffect(() => {
         fetch('http://localhost:5000/products')
             .then(res => res.json())
-            .then(data => setProducts(data))
+            .then(data => {
+                setProducts(data);
+                setTotalProducts(data.length);
+            })
     }, [])
+
+    // console.log(totalProducts);
+    const totalPages = Math.ceil(totalProducts / itemsPerPage);
+    // console.log(totalPages);
+
+    // const pageNumbers = []
+    // for(let i=0; i<10; i++){
+    //     pageNumbers.push(i);
+    // }
+
+    const pageNumbers = [...Array(totalPages).keys()];
+
+    console.log(pageNumbers);
 
     useEffect(() => {
         const storedCart = getShoppingCart();
@@ -67,32 +92,39 @@ const Shop = () => {
 
 
     return (
-        <div className='shop-container'>
-            <div className="products-container">
+        <>
+            <div className='shop-container'>
+                <div className="products-container">
+                    {
+                        products.map(product => <Product
+                            key={product._id}
+                            product={product}
+                            handleAddToCart={handleAddToCart}
+                        ></Product>)
+                    }
+                </div>
+                <div className="cart-container">
+                    <Cart
+                        cart={cart}
+                        handleClearCart={handleClearCart}
+                    >
+                        <Link className='proceed-link' to='/orders'>
+                            <button className='btn-proceed'>
+                                <span>Review Order</span>
+                                <FontAwesomeIcon icon={faArrowRight} />
+                            </button>
+
+                        </Link>
+                    </Cart>
+                </div>
+
+            </div>
+            <div className="pagination">
                 {
-                    products.map(product => <Product
-                        key={product._id}
-                        product={product}
-                        handleAddToCart={handleAddToCart}
-                    ></Product>)
+                    pageNumbers.map( number => <button key={number}>{number}</button>)
                 }
             </div>
-            <div className="cart-container">
-                <Cart
-                    cart={cart}
-                    handleClearCart={handleClearCart}
-                >
-                    <Link className='proceed-link' to='/orders'>
-                        <button className='btn-proceed'>
-                            <span>Review Order</span>
-                            <FontAwesomeIcon icon={faArrowRight} />
-                        </button>
-
-                    </Link>
-                </Cart>
-            </div>
-
-        </div>
+        </>
     );
 };
 
